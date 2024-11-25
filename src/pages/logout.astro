@@ -1,0 +1,13 @@
+---
+import { workos } from "../lib/workos";
+
+const session = workos.userManagement.loadSealedSession({
+  sessionData: Astro.cookies.get("wos-session")?.value as string,
+  cookiePassword: import.meta.env.WORKOS_COOKIE_PASSWORD,
+});
+
+const url = await session.getLogoutUrl();
+
+Astro.cookies.delete("wos-session");
+return Astro.redirect(url);
+---

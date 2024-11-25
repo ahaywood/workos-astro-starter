@@ -1,0 +1,43 @@
+---
+import { workos } from "../../lib/workos";
+
+// http://localhost:4321/api/callback?code=01JD7VEPNS9915RVTCEAX9MWAR
+// The authorization code returned by AuthKit
+const code = Astro.url.searchParams.get("code");
+
+if (!code) {
+  Astro.response.status = 400;
+  Astro.response.statusText = "No code provided";
+  return Astro.redirect("/");
+}
+
+try {
+  const authenticateResponse = await workos.userManagement.authenticateWithCode(
+    {
+      clientId: import.meta.env.WORKOS_CLIENT_ID,
+      code,
+      session: {
+        sealSession: true,
+        cookiePassword: import.meta.env.WORKOS_COOKIE_PASSWORD,
+      },
+    }
+  );
+
+  const { user, sealedSession } = authenticateResponse;
+
+  // Store the session in a cookie
+  Astro.cookies.set("wos-session", sealedSession as string, {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+  });
+
+  // Use the information in `user` for further business logic.
+
+  // Redirect the user to the homepage
+  return Astro.redirect("/");
+} catch (error) {
+  return Astro.redirect("/login");
+}
+---

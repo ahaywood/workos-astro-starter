@@ -1,16 +1,28 @@
 ---
-
+import { isAuthenticated, getUser } from "../lib/workos";
+const authenticated = await isAuthenticated(Astro.cookies);
+const user = await getUser(Astro.cookies);
 ---
 
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <title>AuthKit example</title>
+  </head>
+  <body>
+    <h1>AuthKit example</h1>
+    <p>This is an example of how to use AuthKit with an HTML frontend.</p>
+    {user && `User ${user.firstName} is logged in.`}
+    {
+      !authenticated ? (
+        <p>
+          <a href="/login">Sign in</a>
+        </p>
+      ) : (
+        <p>
+          <a href="/logout">Sign out</a>
+        </p>
+      )
+    }
+  </body>
 </html>
